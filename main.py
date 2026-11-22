@@ -2,11 +2,13 @@ from ultralytics import YOLO
 import serial
 import cv2
 import pygame
+import os
 import time
 
 pygame.init()
-model = YOLO('yolov8n.pt')
-ultrasonic_data = serial.Serial('COM7', 9600)
+model = YOLO('yolov8n.pt')  # official weights are downloaded automatically on first run
+# Serial port of the Arduino, e.g. COM7 on Windows or /dev/ttyACM0 on Linux.
+ultrasonic_data = serial.Serial(os.getenv('SERIAL_PORT', 'COM7'), 9600)
 cap = cv2.VideoCapture(0)
 
 while True:
@@ -18,6 +20,7 @@ while True:
     val = str(x.decode().strip())
     dist = int(val)
     #This is the distance calculated using Ultrasonic sensor.
+    d = 1000  # no person detected in this frame -> treat as out of range
     for i in z:
         boxes=i.boxes.numpy()
         if len(boxes)!=0:
